@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { createClientComponentClient } from '@/utils/supabase/client';
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState('excelardor@gmail.com');
-  const [password, setPassword] = useState('Excelardor99');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function AdminLogin() {
     setError(null);
 
     const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     });
 
@@ -26,13 +26,8 @@ export default function AdminLogin() {
       setError(signInError.message);
       setLoading(false);
     } else {
-      // Set single-use login ticket to allow the initial entry into the dashboard
-      document.cookie = 'admin_login_fresh=1; path=/; max-age=15; SameSite=Lax';
-
-      // Clear any legacy sessionStorage flags
-      sessionStorage.clear();
-
       router.push('/admin');
+      router.refresh();
     }
   };
 
@@ -57,6 +52,8 @@ export default function AdminLogin() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@excelardor.com"
+              autoComplete="email"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-[#4A6B35] focus:ring-1 focus:ring-[#4A6B35] text-sm sm:text-base text-gray-900 bg-gray-50 focus:bg-white transition-all"
               required
             />
@@ -67,6 +64,8 @@ export default function AdminLogin() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="current-password"
               className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-[#4A6B35] focus:ring-1 focus:ring-[#4A6B35] text-sm sm:text-base text-gray-900 bg-gray-50 focus:bg-white transition-all"
               required
             />
